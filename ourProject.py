@@ -263,8 +263,8 @@ def administration_menu():
     exit_button = Button(admin_label, width=60, height=6, padx=20, pady=5, text="Exit", bg="#7692b1", command=admin_screen.destroy)
 
     # Create buttons for the report options
-    view_book_code_listing = Button(report_label, width=60, height=6, padx=10, pady=5, text="View Book Code Listing",bg="#7692b1")
-    view_user_listing = Button(report_label, width=60, height=6, padx=10, pady=5, text="View User Listing",bg="#8da4be")
+    view_book_code_listing = Button(report_label, width=60, height=6, padx=10, pady=5, text="View Book Code Listing",bg="#7692b1", command=view_book_codeListing)
+    view_user_listing = Button(report_label, width=60, height=6, padx=10, pady=5, text="View User Listing",bg="#8da4be",  command=view_userListing)
     view_book_type_listing = Button(report_label, width=60, height=6, padx=10, pady=5, text="View Book Type Listing",bg="#a4b6cb", command=Edit_book_detail)
     types_options = Label(report_label, width=60, height=1, padx=10, pady=5, text="Types Options")
     add_charges = Button(report_label, width=60, height=6, padx=10, pady=5, text="Add Charges",bg="#bac8d8", command=add_Charge_menu)
@@ -415,59 +415,71 @@ def user_maintenance():
     user_maintenance_screen.title("User Maintenance")
     user_maintenance_screen.geometry("600x500")
 
+    # Function to create a label frame
+    def create_label_frame(parent, text):
+        frame = tk.LabelFrame(parent, text=text, font=("Helvetica", 12, "bold"))
+        frame.grid(padx=10, pady=10, sticky="nsew")
+        return frame
+
     # User ID
     user_id_label = tk.Label(user_maintenance_screen, text="User ID:")
-    user_id_label.grid(row=0, column=0, padx=10, pady=10, sticky="e")
+    user_id_label.grid(row=0, column=0, padx=10, pady=10, sticky="w")
 
     user_id_entry = tk.Entry(user_maintenance_screen)
     user_id_entry.grid(row=0, column=1, padx=10, pady=10, sticky="w")
 
-    # Personal Details
-    personal_details_label = tk.Label(user_maintenance_screen, text="Personal Details", font=("Helvetica", 12, "bold"))
-    personal_details_label.grid(row=1, column=0, columnspan=2, pady=(20, 10))
+    # Personal Details Frame
+    personal_frame = create_label_frame(user_maintenance_screen, "Personal Details")
 
     labels = ["User Name:", "Address Line 1:", "Address Line 2:"]
     for i, label_text in enumerate(labels):
-        label = tk.Label(user_maintenance_screen, text=label_text)
-        label.grid(row=i+2, column=0, padx=10, pady=5, sticky="e")
-        entry = tk.Entry(user_maintenance_screen)
-        entry.grid(row=i+2, column=1, padx=10, pady=5, sticky="w")
+        label = tk.Label(personal_frame, text=label_text)
+        label.grid(row=i, column=0, padx=10, pady=5, sticky="e")
+        entry = tk.Entry(personal_frame)
+        entry.grid(row=i, column=1, columnspan=3, padx=10, pady=5, sticky="ew")
 
-    phone_label = tk.Label(user_maintenance_screen, text="Phone:")
-    phone_label.grid(row=5, column=0, padx=10, pady=5, sticky="e")
-    phone_entry = tk.Entry(user_maintenance_screen)
-    phone_entry.grid(row=5, column=1, padx=10, pady=5, sticky="w")
+    phone_label = tk.Label(personal_frame, text="Phone:")
+    phone_label.grid(row=3, column=0, padx=10, pady=5, sticky="e")
+    phone_entry = tk.Entry(personal_frame)
+    phone_entry.grid(row=3, column=1, padx=10, pady=5, sticky="ew")
 
-    cell_label = tk.Label(user_maintenance_screen, text="Cell:")
-    cell_label.grid(row=5, column=2, padx=10, pady=5, sticky="e")
-    cell_entry = tk.Entry(user_maintenance_screen)
-    cell_entry.grid(row=5, column=3, padx=10, pady=5, sticky="w")
+    cell_label = tk.Label(personal_frame, text="Cell:")
+    cell_label.grid(row=3, column=2, padx=10, pady=5, sticky="e")
+    cell_entry = tk.Entry(personal_frame)
+    cell_entry.grid(row=3, column=3, padx=10, pady=5, sticky="ew")
 
-    email_label = tk.Label(user_maintenance_screen, text="Email:")
-    email_label.grid(row=6, column=0, padx=10, pady=5, sticky="e")
-    email_entry = tk.Entry(user_maintenance_screen)
-    email_entry.grid(row=6, column=1, padx=10, pady=5, sticky="w")
+    email_label = tk.Label(personal_frame, text="Email:")
+    email_label.grid(row=4, column=0, padx=10, pady=5, sticky="e")
+    email_entry = tk.Entry(personal_frame)
+    email_entry.grid(row=4, column=1, columnspan=3, padx=10, pady=5, sticky="ew")
 
-    # User Right Update
-    user_rights_label = tk.Label(user_maintenance_screen, text="User Right Update", font=("Helvetica", 12, "bold"))
-    user_rights_label.grid(row=7, column=0, columnspan=2, pady=(20, 10))
+    # User Right Update Frame
+    rights_frame = create_label_frame(user_maintenance_screen, "User Right Update")
 
     rights_labels = ["Admin Rights:", "Librarian Rights:", "User Rights:"]
     for i, right in enumerate(rights_labels):
-        label = tk.Label(user_maintenance_screen, text=right)
-        label.grid(row=i+8, column=0, padx=10, pady=5, sticky="e")
-        entry = tk.Entry(user_maintenance_screen)
-        entry.grid(row=i+8, column=1, padx=10, pady=5, sticky="w")
+        label = tk.Label(rights_frame, text=right)
+        label.grid(row=i, column=0, padx=10, pady=5, sticky="e")
+        entry = tk.Entry(rights_frame)
+        entry.grid(row=i, column=1, columnspan=3, padx=10, pady=5, sticky="ew")
 
     # Buttons
-    update_button = tk.Button(user_maintenance_screen, text="Update", width=10, command=lambda: print("Update"))
-    update_button.grid(row=11, column=0, padx=10, pady=20)
+    button_frame = tk.Frame(user_maintenance_screen)
+    button_frame.grid(row=3, column=0, columnspan=2, padx=10, pady=20)
 
-    ignore_button = tk.Button(user_maintenance_screen, text="Ignore", width=10, command=lambda: print("Ignore"))
-    ignore_button.grid(row=11, column=1, padx=10, pady=20)
+    update_button = tk.Button(button_frame, text="Update", width=10, command=lambda: print("Update"))
+    update_button.grid(row=0, column=0, padx=10)
 
-    exit_button = tk.Button(user_maintenance_screen, text="Exit", width=10, command=user_maintenance_screen.destroy)
-    exit_button.grid(row=11, column=2, padx=10, pady=20)
+    ignore_button = tk.Button(button_frame, text="Ignore", width=10, command=lambda: print("Ignore"))
+    ignore_button.grid(row=0, column=1, padx=10)
+
+    exit_button = tk.Button(button_frame, text="Exit", width=10, command=user_maintenance_screen.destroy)
+    exit_button.grid(row=0, column=2, padx=10)
+
+
+# Call the function to display the user maintenance screen
+#user_maintenance()
+
 
     
 def change_password_logic(old_password_entry, new_password_entry, confirm_password_entry):
@@ -631,70 +643,159 @@ def Edit_book_detail():
     serial_entry = tk.Entry(frame, font=("Arial", 12))
     serial_entry.grid(row=1, column=1, padx=10, pady=5)
 
-    # Book Detail Section
-    book_detail_label = tk.Label(frame, text="Book Detail", font=("Arial", 14, "bold"))
-    book_detail_label.grid(row=2, column=0, columnspan=4, pady=10)
+    # Create a LabelFrame for Book Details
+    book_detail_frame = tk.LabelFrame(frame, text="Book Details", font=("Arial", 12, "bold"))
+    book_detail_frame.grid(row=3, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
 
     # Book Name Label and Textfield
-    book_name_label = tk.Label(frame, text="Book Name:", font=("Arial", 12))
+    book_name_label = tk.Label(book_detail_frame, text="Book Name:", font=("Arial", 12))
     book_name_label.grid(row=3, column=0, padx=10, pady=5, sticky="e")
 
-    book_name_entry = tk.Entry(frame, font=("Arial", 12))
+    book_name_entry = tk.Entry(book_detail_frame, font=("Arial", 12))
     book_name_entry.insert(0, "Education")  # Set default text
     book_name_entry.grid(row=3, column=1, columnspan=3, padx=10, pady=5, sticky="w")
 
     # Author Name Label and Textfield
-    author_name_label = tk.Label(frame, text="Author Name:", font=("Arial", 12))
+    author_name_label = tk.Label(book_detail_frame, text="Author Name:", font=("Arial", 12))
     author_name_label.grid(row=4, column=0, padx=10, pady=5, sticky="e")
 
-    author_name_entry = tk.Entry(frame, font=("Arial", 12))
+    author_name_entry = tk.Entry(book_detail_frame, font=("Arial", 12))
     author_name_entry.grid(row=4, column=1, columnspan=3, padx=10, pady=5, sticky="w")
 
     # Book Des Label and Textfield with Change Picture Button
-    book_des_label = tk.Label(frame, text="Book Description:", font=("Arial", 12))
+    book_des_label = tk.Label(book_detail_frame, text="Book Description:", font=("Arial", 12))
     book_des_label.grid(row=5, column=0, padx=10, pady=5, sticky="e")
 
-    book_des_entry = tk.Entry(frame, font=("Arial", 12))
+    book_des_entry = tk.Entry(book_detail_frame, font=("Arial", 12))
     book_des_entry.grid(row=5, column=1, columnspan=2, padx=10, pady=5, sticky="w")
 
-    change_picture_button = tk.Button(frame, text="Change Picture", font=("Arial", 12))
+    change_picture_button = tk.Button(book_detail_frame, text="Change Picture", font=("Arial", 12))
     change_picture_button.grid(row=5, column=3, padx=10, pady=5, sticky="w")
-    
+
     # Book Type Label and Dropdown
-    book_type_label = tk.Label(frame, text="Book Type:", font=("Arial", 12))
+    book_type_label = tk.Label(book_detail_frame, text="Book Type:", font=("Arial", 12))
     book_type_label.grid(row=6, column=0, padx=10, pady=5, sticky="e")
 
-    book_type_combobox = ttk.Combobox(frame, state="readonly", font=("Arial", 10), width=5)
-    book_type_combobox['values'] = (1, 2, 3, 4)  # Example numeric values
+    book_type_combobox = ttk.Combobox(book_detail_frame, state="readonly", font=("Arial", 10), width=5)
+    book_type_combobox['values'] = (1, 2, 3, 4, 5)  # Example numeric values
     book_type_combobox.current(0)  # Set default value
     book_type_combobox.grid(row=6, column=1, padx=5, pady=5, sticky="w")
 
     # Uneditable Book Type Textfield
-    book_type_entry = tk.Entry(frame, font=("Arial", 10), state="readonly", width=20)
-    book_type_entry.insert(0, "Post Graduate Studies")  # Set default text
+    book_type_entry = tk.Entry(book_detail_frame, font=("Arial", 10), state="readonly", width=20, bg="#ff0000")  # Red background
     book_type_entry.grid(row=6, column=2,sticky="w")
 
     # Book Code Label and Dropdown
-    book_code_label = tk.Label(frame, text="Book Code:", font=("Arial", 12))
+    book_code_label = tk.Label(book_detail_frame, text="Book Code:", font=("Arial", 12))
     book_code_label.grid(row=7, column=0, padx=10, pady=5, sticky="e")
 
-    book_code_combobox = ttk.Combobox(frame, state="readonly", font=("Arial", 10), width=5)
+    book_code_combobox = ttk.Combobox(book_detail_frame, state="readonly", font=("Arial", 10), width=5)
     book_code_combobox['values'] = (101, 102, 103, 104)  # Example numeric values
     book_code_combobox.current(0)  # Set default value
     book_code_combobox.grid(row=7, column=1, padx=5, pady=5, sticky="w")
 
-     # Buttons
+    # Uneditable Book Code Textfield
+    book_code_entry = tk.Entry(book_detail_frame, font=("Arial", 10), state="readonly", width=20, bg="#00ff00")  # Green background
+    book_code_entry.grid(row=7, column=2,sticky="w")
+
+
+
+        # Bind the update functions to dropdown selection events
+    def update_book_type_name(event):
+        book_type = book_type_combobox.get()
+        book_type_name = ""
+        if book_type == "1":
+            book_type_name = "Education"
+        elif book_type == "2":
+            book_type_name = "Fiction"
+        elif book_type == "3":
+            book_type_name = "Science"
+        elif book_type == "4":
+            book_type_name = "History"
+        elif book_type == "5":
+            book_type_name = "Biography"
+        book_type_entry.config(state="normal")
+        book_type_entry.delete(0, tk.END)
+        book_type_entry.insert(0, book_type_name)
+        book_type_entry.config(state="readonly")
+
+    def update_book_code_name(event):
+        book_code = book_code_combobox.get()
+        book_code_name = ""
+        if book_code == "101":
+            book_code_name = "ABC"
+        elif book_code == "102":
+            book_code_name = "DEF"
+        elif book_code == "103":
+            book_code_name = "GHI"
+        elif book_code == "104":
+            book_code_name = "JKL"
+        book_code_entry.config(state="normal")
+        book_code_entry.delete(0, tk.END)
+        book_code_entry.insert(0, book_code_name)
+        book_code_entry.config(state="readonly")
+
+    book_type_combobox.bind("<<ComboboxSelected>>", update_book_type_name)
+    book_code_combobox.bind("<<ComboboxSelected>>", update_book_code_name)
+
+    # Publish Name Label and Textfield
+    publish_name_label = tk.Label(book_detail_frame, text="Publish Name:", font=("Arial", 12))
+    publish_name_label.grid(row=8, column=0, padx=10, pady=5, sticky="e")
+
+    publish_name_entry = tk.Entry(book_detail_frame, font=("Arial", 12))
+    publish_name_entry.grid(row=8, column=1, columnspan=3, padx=10, pady=5, sticky="w")
+
+    # Lab Name Label and Textfield
+    lab_name_label = tk.Label(book_detail_frame, text="Lab Name:", font=("Arial", 12))
+    lab_name_label.grid(row=8, column=2, padx=10, pady=5, sticky="e")
+
+    lab_name_entry = tk.Entry(book_detail_frame, font=("Arial", 12))
+    lab_name_entry.grid(row=8, column=3, columnspan=3, padx=10, pady=5, sticky="w")
+
+    # Buttons
     edit_button = tk.Button(frame, text="Edit", width=10, command=lambda: print("Update"))
-    edit_button.grid(row=8, column=0, padx=10, pady=20)
+    edit_button.grid(row=10, column=0, padx=10, pady=20)
 
     ignore_button = tk.Button(frame, text="Ignore", width=10, command=lambda: print("Ignore"))
-    ignore_button.grid(row=8, column=1, padx=10, pady=20)
+    ignore_button.grid(row=10, column=1, padx=10, pady=20)
 
     exit_button = tk.Button(frame, text="Exit", width=10, command=edit_book.destroy)
-    exit_button.grid(row=8, column=2, padx=10, pady=20)
+    exit_button.grid(row=10, column=2, padx=10, pady=20)
 
-#Add a new user  
- 
+
+def view_book_codeListing():
+    # Create a new window for viewing book code listing
+    book_code_window = tk.Toplevel()
+    book_code_window.title("Book Code Listing")
+    book_code_window.geometry("600x400")
+
+    # Add labels and fields to display book codes
+    book_codes = ["101 - Book A", "102 - Book B", "103 - Book C", "104 - Book D"]  # Example book codes
+    for i, book_code in enumerate(book_codes):
+        label = tk.Label(book_code_window, text=book_code, font=("Arial", 12))
+        label.grid(row=i, column=0, padx=10, pady=5, sticky="w")
+
+def view_userListing():
+    # Create a new window for viewing user listing
+    user_listing_window = tk.Toplevel()
+    user_listing_window.title("User Listing")
+    user_listing_window.geometry("600x400")
+
+    # Add labels and fields to display user listing
+    user_listing = [
+        "User 1 - John Doe", 
+        "User 2 - Jane Smith", 
+        "User 3 - Alice Johnson", 
+        "User 4 - Bob Williams"
+    ]  # Example user listing
+    for i, user in enumerate(user_listing):
+        label = tk.Label(user_listing_window, text=user, font=("Arial", 12))
+        label.grid(row=i, column=0, padx=10, pady=5, sticky="w")
+
+# Example usage:
+# view_book_code_listing()  # Call this function to view the book code listing
+# view_user_listing()  # Call this function to view the user listing
+
 
 def create_user_input_form():
     def save_user_details():
