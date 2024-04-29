@@ -1,5 +1,6 @@
 import tkinter as tk
 import sqlite3
+import mysql.connector
 from tkinter import Frame, Label, Entry, Button, messagebox,LEFT,RIGHT
 import os
 from datetime import date
@@ -12,6 +13,15 @@ import re
 from tkinter import *
 from PIL import Image, ImageTk
 
+mydb = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="library_manager"
+)
+
+# Create a cursor object to execute SQL queries
+cursor = mydb.cursor()
 
 def register():
     global register_screen
@@ -67,31 +77,43 @@ def register_user():
     username_info = username.get()
     password_info = password.get()
 
+    sql = "INSERT INTO user (id, username, password) VALUES (NULL, %s, %s)"
+    val = (username_info, password_info)
+    try:
+        cursor.execute(sql, val)
+        mydb.commit()
+        messagebox.showinfo("Success", "Registration Successful")
+    except mysql.connector.Error as err:
+        messagebox.showerror("Error", f"Error during registration: {err}")
+
+    username_entry.delete(0, tk.END)
+    password_entry.delete(0, tk.END)
+
     # Check if both username and password fields are not empty
-    if username_info and password_info:
-        # Open the credentials file
-        with open("credentials.txt", "r") as file:
-            # Read all lines from the file
-            credentials = file.read().splitlines()
+    # if username_info and password_info:
+    #     # Open the credentials file
+    #     with open("credentials.txt", "r") as file:
+    #         # Read all lines from the file
+    #         credentials = file.read().splitlines()
 
-        # Check if the username already exists
-        if username_info in credentials:
-            messagebox.showerror("Error", "Username already exists. Please choose a different one.")
-        else:
-            # Append the new username and password to the file
-            with open("credentials.txt", "a") as file:
-                file.write(username_info + "\n")
-                file.write(password_info + "\n")
+    #     # Check if the username already exists
+    #     if username_info in credentials:
+    #         messagebox.showerror("Error", "Username already exists. Please choose a different one.")
+    #     else:
+    #         # Append the new username and password to the file
+    #         with open("credentials.txt", "a") as file:
+    #             file.write(username_info + "\n")
+    #             file.write(password_info + "\n")
 
-            # Clear entry fields
-            username_entry.delete(0, END)
-            password_entry.delete(0, END)
+    #         # Clear entry fields
+    #         username_entry.delete(0, END)
+    #         password_entry.delete(0, END)
 
-            # Inform the user about successful registration
-            messagebox.showinfo("Success", "Registration successful.")
-    else:
-        # Show a message indicating that both fields are required
-        messagebox.showerror("Error", "Please enter both username and password.")
+    #         # Inform the user about successful registration
+    #         messagebox.showinfo("Success", "Registration successful.")
+    # else:
+    #     # Show a message indicating that both fields are required
+    #     messagebox.showerror("Error", "Please enter both username and password.")
 
 
 def login():
@@ -147,27 +169,37 @@ def login_verification():
     username1 = username_verify.get()
     password1 = password_verify.get()
 
-    # Check if both username and password fields are not empty
-    if username1 and password1:
-        # Open the credentials file
-        with open("credentials.txt", "r") as file1:
-            # Read all lines from the file
-            verify = file1.read().splitlines()
+    sql = "SELECT * FROM user WHERE username = %s AND password = %s"
+    val = (username1, password1)
+    cursor.execute(sql, val)
+    user = cursor.fetchone()
 
-        # Check if username exists in the list of usernames
-        if username1 in verify:
-            # Find the index of the username in the list
-            index = verify.index(username1)
-            # Check if the password matches the password stored in the next line
-            if password1 == verify[index + 1]:
-                login_sucess()
-            else:
-                password_not_recognised()
-        else:
-            user_not_found()
+    if user:
+        administration_menu() 
     else:
-        # Show a message indicating that both fields are required
-        messagebox.showerror("Error", "Please enter both username and password.")
+        password_not_recognised()
+
+    # Check if both username and password fields are not empty
+    # if username1 and password1:
+    #     # Open the credentials file
+    #     with open("credentials.txt", "r") as file1:
+    #         # Read all lines from the file
+    #         verify = file1.read().splitlines()
+
+    #     # Check if username exists in the list of usernames
+    #     if username1 in verify:
+    #         # Find the index of the username in the list
+    #         index = verify.index(username1)
+    #         # Check if the password matches the password stored in the next line
+    #         if password1 == verify[index + 1]:
+    #             login_sucess()
+    #         else:
+    #             password_not_recognised()
+    #     else:
+    #         user_not_found()
+    # else:
+    #     # Show a message indicating that both fields are required
+    #     messagebox.showerror("Error", "Please enter both username and password.")
 
 
 def login_sucess():
@@ -377,38 +409,63 @@ def add_book_menu():
         
 def add_book_code():
     global add_new_book_code
-    add_new_book_code=tk.Toplevel(main_screen)
+    add_new_book_code = tk.Toplevel(main_screen)
     add_new_book_code.title("Add New Book Type")
     add_new_book_code.geometry("300x180")
-# Heading label
-    heading_label = Label(add_new_book_code, text="Book Code Details")
-    heading_label.grid(row=0, columnspan=2, pady=10)  # Use grid layout with columnspan=2
 
-# Create labels and entry fields for Book details (using grid layout)
-    type_no_label = Label(add_new_book_code, text="Book Code")
+    # Heading label
+    heading_label = tk.Label(add_new_book_code, text="Book Code Details")
+    heading_label.grid(row=0, columnspan=2, pady=10)
+
+    # Create labels and entry fields for Book details (using grid layout)
+    type_no_label = tk.Label(add_new_book_code, text="Book Code")
     type_no_label.grid(row=1, column=0)
 
-    type_no_entry = Entry(add_new_book_code)
-    type_no_entry.grid(row=1, column=1, padx=5)  # Add padding between label and entry
-    type_desc_label = Label(add_new_book_code, text="Description")
+    type_no_entry = tk.Entry(add_new_book_code)
+    type_no_entry.grid(row=1, column=1, padx=5)
+
+    type_desc_label = tk.Label(add_new_book_code, text="Description")
     type_desc_label.grid(row=2, column=0)
 
-    type_desc_entry = Entry(add_new_book_code)
-    type_desc_entry.grid(row=2, column=1, padx=5)  # Add padding between label and entry
+    type_desc_entry = tk.Entry(add_new_book_code)
+    type_desc_entry.grid(row=2, column=1, padx=5)
 
+    # Create buttons (Add, Ignore, Exit)
+    button_frame = tk.Frame(add_new_book_code)
+    button_frame.grid(row=4, columnspan=2, pady=10)
 
-# Create buttons (Add, Ignore, Exit)
-    button_frame = Frame(add_new_book_code)  # Create a separate frame for buttons
-    button_frame.grid(row=4, columnspan=2, pady=10)  # Use grid layout
+    def add_book_to_db():
+        # Fetch the inputs from the form
+        book_code = type_no_entry.get()
+        description = type_desc_entry.get()
 
-    add_button = Button(button_frame, text="Add", width=10)
-    add_button.pack(side=LEFT, padx=5)  # Pack within button_frame
+        # Create a cursor object
+        cursor = mydb.cursor()
 
-    ignore_button = Button(button_frame, text="Ignore", width=10)
-    ignore_button.pack(side=LEFT, padx=5)  # Pack within button_frame
+        # Prepare the SQL query to insert the new book type number and description
+        query = "INSERT INTO book_types (book_code, description) VALUES (%s, %s)"
 
-    exit_button = Button(button_frame, text="Exit", width=10, command=add_new_book_code.destroy)
-    exit_button.pack(side=LEFT, padx=5)  # Pack within button_frame 
+        # Execute the query
+        cursor.execute(query, (book_code, description))
+
+        # Commit the transaction
+        mydb.commit()
+
+        # Close the cursor and connection
+        cursor.close()
+        mydb.close()
+
+        # Optionally, show a success message
+        tk.messagebox.showinfo("Success", "Book type added successfully.")
+
+    add_button = tk.Button(button_frame, text="Add", width=10, command=add_book_to_db)
+    add_button.pack(side=tk.LEFT, padx=5)
+
+    ignore_button = tk.Button(button_frame, text="Ignore", width=10)
+    ignore_button.pack(side=tk.LEFT, padx=5)
+
+    exit_button = tk.Button(button_frame, text="Exit", width=10, command=add_new_book_code.destroy)
+    exit_button.pack(side=tk.LEFT, padx=5)
         
 def user_maintenance():
     user_maintenance_screen = tk.Toplevel(main_screen)
@@ -781,17 +838,27 @@ def view_userListing():
     user_listing_window.title("User Listing")
     user_listing_window.geometry("600x400")
 
+    # Create a cursor object
+    cursor = mydb.cursor()
+
+    # Prepare the SQL query to fetch all students
+    query = "SELECT first_name, last_name FROM students"
+
+    # Execute the query
+    cursor.execute(query)
+
+    # Fetch all the records
+    records = cursor.fetchall()
+
+    # Close the cursor and connection
+    cursor.close()
+    mydb.close()
+
     # Add labels and fields to display user listing
-    user_listing = [
-        "User 1 - John Doe", 
-        "User 2 - Jane Smith", 
-        "User 3 - Alice Johnson", 
-        "User 4 - Bob Williams"
-    ]  # Example user listing
-    for i, user in enumerate(user_listing):
+    for i, record in enumerate(records):
+        user = f"{record[0]} {record[1]}" # Assuming first_name and last_name are the columns you want to display
         label = tk.Label(user_listing_window, text=user, font=("Arial", 12))
         label.grid(row=i, column=0, padx=10, pady=5, sticky="w")
-
 # Example usage:
 # view_book_code_listing()  # Call this function to view the book code listing
 # view_user_listing()  # Call this function to view the user listing
@@ -806,38 +873,6 @@ def create_user_input_form():
 
         frame = tk.Frame(edit_book)
         frame.pack(fill=tk.BOTH, expand=True)
-
-        # Retrieve user inputs
-        firstname = first_name_entry.get()
-        lastname = last_name_entry.get()
-        age = age_entry.get()
-        # Add more fields as needed
-
-        # Validate user inputs
-        if not firstname or not lastname or not age:  # Check if any field is empty
-            messagebox.showerror("Error", "Please fill in all fields.")
-            return
-
-        # Connect to SQLite database
-        conn = sqlite3.connect('user_details.db')
-        cursor = conn.cursor()
-
-        # Create table if not exists
-        cursor.execute('''CREATE TABLE IF NOT EXISTS Users
-                          (id INTEGER PRIMARY KEY, firstname TEXT, lastname TEXT, age INT)''')
-
-        # Insert user details into the table
-        cursor.execute('''INSERT INTO Users (firstname, lastname, age) VALUES (?, ?, ?)''',
-                       (firstname, lastname, age))
-        conn.commit()
-        conn.close()
-
-        # Display success message
-        messagebox.showinfo("Success", "User details saved successfully.")
-
-        # Create main window
-        # root = tk.Tk()
-        # root.title("User Details Input Form")
 
         # Create labels and entry fields
         tk.Label(frame, text="First Name:").pack()
@@ -861,66 +896,53 @@ def create_user_input_form():
 # Call the function to create the user input form
 create_user_input_form()
 
+def add_student(first_name, last_name, title, age, nationality, registration_status, completed_courses, semesters, terms_accepted):
+    # This is where you would add the code to insert the data into your database
+    try:
+        cursor = mydb.cursor()
+
+        # Prepare the SQL query
+        query = """
+        INSERT INTO students (id, first_name, last_name, title, age, nationality, registration_status, completed_courses, semesters, terms_accepted)
+        VALUES (NULL, %s, %s, %s, %s, %s, "Yes", %s, %s, "Yes")
+        """
+
+        # Execute the query
+        cursor.execute(query, (first_name, last_name, title, age, nationality, completed_courses, semesters))
+
+        # Commit the transaction
+        mydb.commit()
+
+        # Close the connection
+        cursor.close()
+        mydb.close()
+
+        # Optionally, show a success message
+        tk.messagebox.showinfo("Success", "User data added successfully.")
+
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        tk.messagebox.showerror("Error", "Failed to add user data.")
+
+
+    print(f"Adding student: {first_name} {last_name}")
+
 
 def add_new_users():
     global add_new_user
+    global first_name_entry
+    global last_name_entry
+    global title_combobox
+    global age_spinbox
+    global nationality_combobox
+    global reg_status_var
+    global numcourses_spinbox
+    global numsemesters_spinbox
+    global accept_var
     add_new_user = tk.Toplevel(main_screen)
     add_new_user.title("Data Entry Form")
     add_new_user.geometry("600x400")
-    # accepted = accept_var.get()
     
-    # if accepted=="Accepted":
-    #     # User info
-    #     firstname = first_name_entry.get()
-    #     lastname = last_name_entry.get()
-        
-    #     if firstname and lastname:
-    #         title = title_combobox.get()
-    #         age = age_spinbox.get()
-    #         nationality = nationality_combobox.get()
-            
-    #         # Course info
-    #         registration_status = reg_status_var.get()
-    #         numcourses = numcourses_spinbox.get()
-    #         numsemesters = numsemesters_spinbox.get()
-            
-    #         print("First name: ", firstname, "Last name: ", lastname)
-    #         print("Title: ", title, "Age: ", age, "Nationality: ", nationality)
-    #         print("# Courses: ", numcourses, "# Semesters: ", numsemesters)
-    #         print("Registration status", registration_status)
-    #         print("------------------------------------------")
-            
-    #         # Create Table
-    #         conn = sqlite3.connect('data.db')
-    #         table_create_query = '''CREATE TABLE IF NOT EXISTS Student_Data 
-    #                 (firstname TEXT, lastname TEXT, title TEXT, age INT, nationality TEXT, 
-    #                 registration_status TEXT, num_courses INT, num_semesters INT)
-    #         '''
-    #         conn.execute(table_create_query)
-            
-    #         # Insert Data
-    #         data_insert_query = '''INSERT INTO Student_Data (firstname, lastname, title, 
-    #         age, nationality, registration_status, num_courses, num_semesters) VALUES 
-    #         (?, ?, ?, ?, ?, ?, ?, ?)'''
-    #         data_insert_tuple = (firstname, lastname, title,
-    #                               age, nationality, registration_status, numcourses, numsemesters)
-    #         cursor = conn.cursor()
-    #         cursor.execute(data_insert_query, data_insert_tuple)
-    #         conn.commit()
-    #         conn.close()
-
-            
-                
-    #     else:
-    #         messagebox.showwarning(title="Error", message="First name and last name are required.")
-    # else:
-    #     messagebox.showwarning(title= "Error", message="You have not accepted the terms")
-
-# window = tkinter.Tk()
-# window.title("Data Entry Form")
-
-# frame = tkinter.Frame(window)
-# frame.pack()
     # Create a frame for the window content
     frame = tk.Frame(add_new_user)
     frame.pack()
@@ -990,9 +1012,22 @@ def add_new_users():
     terms_check.grid(row=0, column=0)
 
     # Button
-    button = tk.Button(frame, text="Enter data", command=add_new_users)
+    button = tk.Button(frame, text="Enter data", command=lambda: submit_data())
     button.grid(row=3, column=0, padx=20, pady=10)
 
+
+def submit_data():
+    first_name = first_name_entry.get()
+    last_name = last_name_entry.get()
+    title = title_combobox.get()
+    age = age_spinbox.get()
+    nationality = nationality_combobox.get()
+    registration_status = reg_status_var.get()
+    completed_courses = numcourses_spinbox.get()
+    semesters = numsemesters_spinbox.get()
+    terms_accepted = accept_var.get()
+
+    add_student(first_name, last_name, title, age, nationality, registration_status, completed_courses, semesters, terms_accepted)
 
 def main_account_screen():
     global main_screen
